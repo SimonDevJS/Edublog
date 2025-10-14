@@ -1,5 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { Image } from "astro:assets";
+import simonImage from "../../public/simon1.jpg";
 ---
 
 <Layout
@@ -10,7 +12,16 @@ import Layout from "../layouts/Layout.astro";
     <div class="container">
       <div class="about-hero">
         <div class="profile-image-wrapper">
-          <img src="/simon.jpg" alt="Simón López" class="profile-image" />
+          <Image
+            src={simonImage}
+            alt="Simón López"
+            class="profile-image"
+            width={250}
+            height={300}
+            loading="eager"
+            format="webp"
+            quality={80}
+          />
         </div>
         <div class="about-intro">
           <h1 class="about-title">Simón López</h1>

@@ -1,0 +1,155 @@
+---
+const {
+  type,
+  url,
+  title = "Documento",
+  height = "600px",
+  description,
+} = Astro.props;
+
+const getGoogleDriveEmbedUrl = (url: string) => {
+  // Detectar tipo de documento de Google
+  if (url.includes("docs.google.com/document")) {
+    const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    if (match) {
+      return `https://docs.google.com/document/d/${match[1]}/preview`;
+    }
+  } else if (url.includes("docs.google.com/spreadsheets")) {
+    const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    if (match) {
+      return `https://docs.google.com/spreadsheets/d/${match[1]}/preview`;
+    }
+  } else if (url.includes("docs.google.com/presentation")) {
+    const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    if (match) {
+      return `https://docs.google.com/presentation/d/${match[1]}/preview`;
+    }
+  } else if (url.includes("drive.google.com")) {
+    // Para enlaces genéricos de Drive
+    const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    if (match) {
+      return `https://drive.google.com/file/d/${match[1]}/preview`;
+    }
+  }
+  return url;
+};
+
+const embedUrl = type === "google-drive" ? getGoogleDriveEmbedUrl(url) : url;
+---
+
+<div class="document-embed">
+  {description && <p class="document-description">{description}</p>}
+
+  {
+    type === "download" ? (
+      <div class="download-card">
+        <svg
+          class="download-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="48"
+          height="48"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        <h3>{title}</h3>
+        <a href={url} download class="download-button">
+          Descargar documento
+        </a>
+      </div>
+    ) : (
+      <div class="iframe-container" style={`height: ${height}`}>
+        <iframe
+          src={embedUrl}
+          title={title}
+          frameborder="0"
+          allowfullscreen
+          loading="lazy"
+        />
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .document-embed {
+    margin: 2rem 0;
+  }
+
+  .document-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+
+  .iframe-container {
+    position: relative;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: var(--bg-secondary);
+  }
+
+  .iframe-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .download-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .download-card:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .download-icon {
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+  }
+
+  .download-card h3 {
+    margin: 0 0 1.5rem 0;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+  }
+
+  .download-button {
+    display: inline-block;
+    background: var(--accent-color);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .download-button:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .iframe-container {
+      height: 400px !important;
+    }
+  }
+</style>
